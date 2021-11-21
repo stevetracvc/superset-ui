@@ -272,7 +272,15 @@ export default function DataTable<D extends object>({
                 {row.cells.map(cell =>
                   numberRows &&
                   cell.column.id == 'react_table_row_number_column' ? (
-                    <td>{pageIndex * pageSize + index + 1}</td>
+                    <td>
+                      <div
+                        style={{
+                          width: cell.column.width,
+                          height: 0.01,
+                        }}
+                      />
+                      {pageIndex * pageSize + index + 1}
+                    </td>
                   ) : (
                     cell.render('Cell', { key: cell.column.id })
                   ),

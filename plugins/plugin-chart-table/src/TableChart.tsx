@@ -188,7 +188,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     filters,
     sticky = true, // whether to use sticky header
     columnColorFormatters,
-    rearrangeColumns = false,
+    rearrangeColumns = true,
     numberRows = false,
   } = props;
   const timestampFormatter = useCallback(
@@ -481,6 +481,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     if (numberRows) {
       cols.unshift({
         id: 'react_table_row_number_column',
+        Header: <th>#</th>,
         width: 50,
         disableGlobalFilter: true,
         disableSortBy: true,
