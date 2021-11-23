@@ -65,6 +65,7 @@ export interface DataTableProps<D extends object> extends TableOptions<D> {
   wrapperRef?: MutableRefObject<HTMLDivElement>;
   onColumnOrderChange: () => void;
   rearrangeColumns: boolean;
+  numberRows: boolean;
 }
 
 export interface RenderHTMLCellProps extends HTMLProps<HTMLTableCellElement> {
@@ -93,6 +94,7 @@ export default function DataTable<D extends object>({
   serverPagination,
   wrapperRef: userWrapperRef,
   rearrangeColumns,
+  numberRows,
   onColumnOrderChange,
   ...moreUseTableOptions
 }: DataTableProps<D>): JSX.Element {
@@ -144,6 +146,7 @@ export default function DataTable<D extends object>({
     paginationRef,
     resultsSize,
     paginationData,
+    numberRows, // this adds a new column
   ]);
 
   const defaultGlobalFilter: FilterType<D> = useCallback(
@@ -261,13 +264,26 @@ export default function DataTable<D extends object>({
       </thead>
       <tbody {...getTableBodyProps()}>
         {page && page.length > 0 ? (
-          page.map(row => {
+          page.map((row, index) => {
             prepareRow(row);
             const { key: rowKey, ...rowProps } = row.getRowProps();
             return (
               <tr key={rowKey || row.id} {...rowProps}>
                 {row.cells.map(cell =>
-                  cell.render('Cell', { key: cell.column.id }),
+                  numberRows &&
+                  cell.column.id == 'react_table_row_number_column' ? (
+                    <td>
+                      <div
+                        style={{
+                          width: cell.column.width,
+                          height: 0.01,
+                        }}
+                      />
+                      {pageIndex * pageSize + index + 1}
+                    </td>
+                  ) : (
+                    cell.render('Cell', { key: cell.column.id })
+                  ),
                 )}
               </tr>
             );
