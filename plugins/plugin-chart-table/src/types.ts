@@ -72,6 +72,7 @@ export type TableChartFormData = QueryFormData & {
   time_grain_sqla?: TimeGranularity;
   column_config?: Record<string, ColumnConfig>;
   rearrange_columns?: boolean;
+  sticky_column_count?: number;
 };
 
 export interface TableChartProps extends ChartProps {
@@ -111,6 +112,7 @@ export interface TableChartTransformedProps<D extends DataRecord = DataRecord> {
   onChangeFilter?: ChartProps['hooks']['onAddFilter'];
   columnColorFormatters?: ColorFormatters;
   rearrangeColumns?: boolean;
+  stickyColumnCount?: number;
   numberRows?: boolean;
 }
 

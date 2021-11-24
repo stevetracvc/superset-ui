@@ -52,6 +52,9 @@ import { updateExternalFormData } from './DataTable/utils/externalAPIs';
 
 type ValueRange = [number, number];
 
+// set the width for the row-number column to 50 px
+export const ROW_NUMBER_COLUMN_WIDTH = 50;
+
 /**
  * Return sortType based on data type
  */
@@ -186,6 +189,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     emitFilter = false,
     sortDesc = false,
     filters,
+    stickyColumnCount = 0,
     sticky = true, // whether to use sticky header
     columnColorFormatters,
     rearrangeColumns = true,
@@ -319,6 +323,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     };
   };
 
+  let cumulativeWidth = (numberRows ? ROW_NUMBER_COLUMN_WIDTH + 5 * 2  : 0);
   const getColumnConfigs = useCallback(
     (column: DataColumnMeta, i: number): ColumnWithLooseAccessor<D> => {
       const { key, label, isNumeric, dataType, isMetric, config = {} } = column;
@@ -355,6 +360,21 @@ export default function TableChart<D extends DataRecord = DataRecord>(
       let className = '';
       if (isFilter) {
         className += ' dt-is-filter';
+      }
+
+      let stickyExtraStyle: { backgroundColor: string; left: number };
+      if (i < stickyColumnCount) {
+        className += ' dt-sticky-column';
+        if (i == stickyColumnCount - 1) {
+          // add border on right
+          className += ' dt-sticky-column-last';
+        }
+        stickyExtraStyle = {
+          backgroundColor: 'white',
+          left: cumulativeWidth,
+        };
+        // 16.8 = 1.4 em * 12 pt font
+        cumulativeWidth += Math.ceil(columnWidth! + 5 + 16.8);
       }
 
       return {
@@ -395,6 +415,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
             ].join(' '),
             style: {
               ...sharedStyle,
+              ...stickyExtraStyle,
               background:
                 backgroundColor ||
                 (valueRange
@@ -404,7 +425,8 @@ export default function TableChart<D extends DataRecord = DataRecord>(
                       alignPositiveNegative,
                       colorPositiveNegative,
                     })
-                  : undefined),
+                  : undefined) ||
+                stickyExtraStyle?.backgroundColor,
             },
           };
           if (html) {
@@ -422,16 +444,18 @@ export default function TableChart<D extends DataRecord = DataRecord>(
             style={{
               ...sharedStyle,
               ...style,
+              ...stickyExtraStyle,
             }}
             onClick={onClick}
             data-column-name={col.id}
-            {...(rearrangeColumns && {
-              draggable: 'true',
-              onDragStart,
-              onDragOver: e => e.preventDefault(),
-              onDragEnter: e => e.preventDefault(),
-              onDrop,
-            })}
+            {...(rearrangeColumns &&
+              i >= stickyColumnCount && {
+                draggable: 'true',
+                onDragStart,
+                onDragOver: e => e.preventDefault(),
+                onDragEnter: e => e.preventDefault(),
+                onDrop,
+              })}
           >
             {/* can't use `columnWidth &&` because it may also be zero */}
             {config.columnWidth ? (
@@ -481,8 +505,19 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     if (numberRows) {
       cols.unshift({
         id: 'react_table_row_number_column',
-        Header: <th>#</th>,
-        width: 50,
+        Header: (
+          <th
+            style={{
+              left: '0px',
+              backgroundColor: 'white',
+              width: `${ROW_NUMBER_COLUMN_WIDTH}px`,
+            }}
+            className={stickyColumnCount ? 'dt-sticky-column' : undefined}
+          >
+            #
+          </th>
+        ),
+        width: ROW_NUMBER_COLUMN_WIDTH,
         disableGlobalFilter: true,
         disableSortBy: true,
       });
@@ -514,6 +549,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
         onColumnOrderChange={() => setColumnOrderToggle(!columnOrderToggle)}
         rearrangeColumns={rearrangeColumns}
         numberRows={numberRows}
+        stickyColumnCount={stickyColumnCount}
         // 9 page items in > 340px works well even for 100+ pages
         maxPageItemCount={width > 340 ? 9 : 7}
         noResults={(filter: string) =>

@@ -66,6 +66,7 @@ export interface DataTableProps<D extends object> extends TableOptions<D> {
   onColumnOrderChange: () => void;
   rearrangeColumns: boolean;
   numberRows: boolean;
+  stickyColumnCount: number;
 }
 
 export interface RenderHTMLCellProps extends HTMLProps<HTMLTableCellElement> {
@@ -95,6 +96,7 @@ export default function DataTable<D extends object>({
   wrapperRef: userWrapperRef,
   rearrangeColumns,
   numberRows,
+  stickyColumnCount,
   onColumnOrderChange,
   ...moreUseTableOptions
 }: DataTableProps<D>): JSX.Element {
@@ -272,7 +274,12 @@ export default function DataTable<D extends object>({
                 {row.cells.map(cell =>
                   numberRows &&
                   cell.column.id == 'react_table_row_number_column' ? (
-                    <td>
+                    <td
+                      className={
+                        stickyColumnCount ? 'dt-sticky-column' : undefined
+                      }
+                      style={{ left: '0px', backgroundColor: 'white' }}
+                    >
                       <div
                         style={{
                           width: cell.column.width,

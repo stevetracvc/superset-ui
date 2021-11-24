@@ -473,6 +473,20 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'sticky_column_count',
+            config: {
+              type: 'TextControl',
+              label: t('Number of Sticky Columns (left side)'),
+              renderTrigger: true,
+              default: 0,
+              description: t(
+                'Allow the first n columns to remain sticky on the left. If more than one, minimum column widths MUST be set for all sticky columns.',
+              ),
+            },
+          },
+        ],
+        [
+          {
             name: 'column_config',
             config: {
               type: 'ColumnConfigControl',

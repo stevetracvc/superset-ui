@@ -79,6 +79,17 @@ export default styled.div`
     float: right;
   }
 
+  .dt-sticky-column {
+    /* hack it so on top, controls are 1030 */
+    z-index: 999;
+    position: sticky;
+    position: -webkit-sticky;
+  }
+
+  .dt-sticky-column-last {
+    box-shadow: inset -2px 0 0 0 #000000;
+  }
+
   .dt-pagination {
     text-align: right;
     /* use padding instead of margin so clientHeight can capture it */
