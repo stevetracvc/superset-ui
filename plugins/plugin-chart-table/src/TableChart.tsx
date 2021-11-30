@@ -37,7 +37,7 @@ import {
   tn,
 } from '@superset-ui/core';
 
-import _ from 'lodash';
+import { groupBy, map } from 'lodash';
 import { DataColumnMeta, TableChartTransformedProps } from './types';
 import DataTable, {
   DataTableProps,
@@ -56,6 +56,7 @@ type ValueRange = [number, number];
 // set the width for the row-number column to 50 px
 export const ROW_NUMBER_COLUMN_WIDTH = 50;
 export const ROW_NUMBER_COLUMN_ID = 'react_table_row_number_column';
+export const ROW_NUMBER_COLUMN_HEADER = '  ';
 
 /**
  * Return sortType based on data type
@@ -332,7 +333,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     [key: string]: number;
   };
   const groupedStartX: groupedStartXType = numberRows
-    ? { ' ': cumulativeWidth }
+    ? { ROW_NUMBER_COLUMN_HEADER: 0 }
     : {};
   const groupedColumnsArray: string[] = [];
   let groupedColumns = false;
@@ -551,37 +552,37 @@ export default function TableChart<D extends DataRecord = DataRecord>(
       });
     }
     if (groupedColumns) {
-      return _(cols)
-        .groupBy(item => {
-          const value = item.columnGroup;
+      const ret = groupBy(cols, item => {
+        const value = item.columnGroup;
 
-          if (!value) {
-            return item.id == ROW_NUMBER_COLUMN_ID ? '  ' : ' ';
-          }
+        if (!value) {
+          return item.id == ROW_NUMBER_COLUMN_ID
+            ? ROW_NUMBER_COLUMN_HEADER
+            : ' ';
+        }
 
-          return value;
-        })
-        .map((d, key) => ({
-          Header: ({ column: col }: { column: ColumnInstance<D> }) => (
-            <th
-              {...col.getHeaderProps()}
-              {...(stickyColumnCount
-                ? {
-                    className: 'dt-sticky-column',
-                    style: {
-                      left: `${groupedStartX[key]}px`,
-                      backgroundColor: 'white',
-                    },
-                  }
-                : null)}
-            >
-              {key}
-            </th>
-          ),
-          id: key,
-          columns: d,
-        }))
-        .value();
+        return value;
+      });
+      return map(ret, (d, key) => ({
+        Header: ({ column: col }: { column: ColumnInstance<D> }) => (
+          <th
+            {...col.getHeaderProps()}
+            {...(stickyColumnCount
+              ? {
+                  className: 'dt-sticky-column',
+                  style: {
+                    left: `${groupedStartX[key]}px`,
+                    backgroundColor: 'white',
+                  },
+                }
+              : null)}
+          >
+            {key}
+          </th>
+        ),
+        id: key,
+        columns: d,
+      }));
     }
     return cols;
   }, [columnsMeta, getColumnConfigs, numberRows]);
