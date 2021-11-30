@@ -40,7 +40,8 @@ export type SharedColumnConfigProp =
   | 'd3SmallNumberFormat'
   | 'd3TimeFormat'
   | 'horizontalAlign'
-  | 'showCellBars';
+  | 'showCellBars'
+  | 'columnGroup';
 
 const emitTarget: ControlFormItemSpec<'Input'> = {
   controlType: 'Input',
@@ -142,6 +143,14 @@ const colorPositiveNegative: ControlFormItemSpec<'Checkbox'> = {
   debounceDelay: 200,
 };
 
+const columnGroup: ControlFormItemSpec<'Input'> = {
+  controlType: 'Input',
+  label: t('Column Group Name'),
+  description: t('Create super headers for groups of columns'),
+  width: 120,
+  placeholder: undefined,
+  debounceDelay: 400,
+};
 /**
  * All configurable column formatting properties.
  */
@@ -163,6 +172,7 @@ export const SHARED_COLUMN_CONFIG_PROPS = {
   showCellBars,
   alignPositiveNegative,
   colorPositiveNegative,
+  columnGroup,
 };
 
 export type SharedColumnConfig = {
@@ -171,12 +181,14 @@ export type SharedColumnConfig = {
 
 export const DEFAULT_CONFIG_FORM_LAYOUT: ColumnConfigFormLayout = {
   [GenericDataType.STRING]: [
+    ['columnGroup'],
     [
       'columnWidth',
       { name: 'horizontalAlign', override: { defaultValue: 'left' } },
     ],
   ],
   [GenericDataType.NUMERIC]: [
+    ['columnGroup'],
     [
       'columnWidth',
       { name: 'horizontalAlign', override: { defaultValue: 'right' } },
@@ -187,6 +199,7 @@ export const DEFAULT_CONFIG_FORM_LAYOUT: ColumnConfigFormLayout = {
     ['showCellBars'],
   ],
   [GenericDataType.TEMPORAL]: [
+    ['columnGroup'],
     [
       'columnWidth',
       { name: 'horizontalAlign', override: { defaultValue: 'left' } },
@@ -194,6 +207,7 @@ export const DEFAULT_CONFIG_FORM_LAYOUT: ColumnConfigFormLayout = {
     ['d3TimeFormat'],
   ],
   [GenericDataType.BOOLEAN]: [
+    ['columnGroup'],
     [
       'columnWidth',
       { name: 'horizontalAlign', override: { defaultValue: 'left' } },

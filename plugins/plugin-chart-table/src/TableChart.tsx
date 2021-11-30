@@ -54,6 +54,7 @@ type ValueRange = [number, number];
 
 // set the width for the row-number column to 50 px
 export const ROW_NUMBER_COLUMN_WIDTH = 50;
+export const ROW_NUMBER_COLUMN_ID = 'react_table_row_number_column';
 
 /**
  * Return sortType based on data type
@@ -323,7 +324,17 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     };
   };
 
-  let cumulativeWidth = (numberRows ? ROW_NUMBER_COLUMN_WIDTH + 5 * 2  : 0);
+  let cumulativeWidth = numberRows ? ROW_NUMBER_COLUMN_WIDTH + 5 * 2 : 0;
+  let maxStickyWidth = cumulativeWidth;
+  // keep track of each header group total width too
+  type groupedStartXType = {
+    [key: string]: number;
+  };
+  const groupedStartX: groupedStartXType = numberRows
+    ? { ' ': cumulativeWidth }
+    : {};
+  const groupedColumnsArray = [];
+  let groupedColumns = false;
   const getColumnConfigs = useCallback(
     (column: DataColumnMeta, i: number): ColumnWithLooseAccessor<D> => {
       const { key, label, isNumeric, dataType, isMetric, config = {} } = column;
@@ -331,6 +342,10 @@ export default function TableChart<D extends DataRecord = DataRecord>(
       const columnWidth = Number.isNaN(Number(config.columnWidth))
         ? config.columnWidth
         : Number(config.columnWidth);
+      groupedColumnsArray[i] = config?.columnGroup || '';
+      if (groupedColumnsArray[i] != '') {
+        groupedColumns = true;
+      }
 
       // inline style for both th and td cell
       const sharedStyle: CSSProperties = getSharedStyle(column);
@@ -373,8 +388,16 @@ export default function TableChart<D extends DataRecord = DataRecord>(
           backgroundColor: 'white',
           left: cumulativeWidth,
         };
-        // 16.8 = 1.4 em * 12 pt font
-        cumulativeWidth += Math.ceil(columnWidth! + 5 + 16.8);
+      }
+      if (!((config?.columnGroup || ' ') in groupedStartX)) {
+        groupedStartX[config?.columnGroup || ' '] = isNaN(cumulativeWidth)
+          ? maxStickyWidth
+          : Math.min(cumulativeWidth, maxStickyWidth);
+      }
+      // 16.8 = 1.4 em * 12 pt font
+      cumulativeWidth += Math.ceil(columnWidth! + 5 + 16.8);
+      if (i < stickyColumnCount) {
+        maxStickyWidth = cumulativeWidth;
       }
 
       return {
@@ -482,6 +505,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
         ) : undefined,
         sortDescFirst: sortDesc,
         sortType: getSortTypeByDataType(dataType),
+        columnGroup: config?.columnGroup,
       };
     },
     [
@@ -504,7 +528,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     const cols = columnsMeta.map(getColumnConfigs);
     if (numberRows) {
       cols.unshift({
-        id: 'react_table_row_number_column',
+        id: ROW_NUMBER_COLUMN_ID,
         Header: (
           <th
             style={{
@@ -521,6 +545,39 @@ export default function TableChart<D extends DataRecord = DataRecord>(
         disableGlobalFilter: true,
         disableSortBy: true,
       });
+    }
+    if (groupedColumns) {
+      return _(cols)
+        .groupBy(item => {
+          const value = item.columnGroup;
+
+          if (!value) {
+            return item.id == ROW_NUMBER_COLUMN_ID ? '  ' : ' ';
+          }
+
+          return value;
+        })
+        .map((d, key) => ({
+          Header: ({ column: col }) => (
+            <th
+              {...col.getHeaderProps()}
+              {...(stickyColumnCount
+                ? {
+                    className: 'dt-sticky-column',
+                    style: {
+                      left: `${groupedStartX[key]}px`,
+                      backgroundColor: 'white',
+                    },
+                  }
+                : null)}
+            >
+              {key}
+            </th>
+          ),
+          id: key,
+          columns: d,
+        }))
+        .value();
     }
     return cols;
   }, [columnsMeta, getColumnConfigs, numberRows]);
