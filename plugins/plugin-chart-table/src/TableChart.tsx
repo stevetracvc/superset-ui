@@ -37,6 +37,7 @@ import {
   tn,
 } from '@superset-ui/core';
 
+import _ from 'lodash';
 import { DataColumnMeta, TableChartTransformedProps } from './types';
 import DataTable, {
   DataTableProps,
@@ -333,10 +334,13 @@ export default function TableChart<D extends DataRecord = DataRecord>(
   const groupedStartX: groupedStartXType = numberRows
     ? { ' ': cumulativeWidth }
     : {};
-  const groupedColumnsArray = [];
+  const groupedColumnsArray: string[] = [];
   let groupedColumns = false;
   const getColumnConfigs = useCallback(
-    (column: DataColumnMeta, i: number): ColumnWithLooseAccessor<D> => {
+    (
+      column: DataColumnMeta,
+      i: number,
+    ): ColumnWithLooseAccessor<D> & { columnGroup?: string | undefined } => {
       const { key, label, isNumeric, dataType, isMetric, config = {} } = column;
       const isFilter = !isNumeric && emitFilter;
       const columnWidth = Number.isNaN(Number(config.columnWidth))
@@ -558,7 +562,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
           return value;
         })
         .map((d, key) => ({
-          Header: ({ column: col }) => (
+          Header: ({ column: col }: { column: ColumnInstance<D> }) => (
             <th
               {...col.getHeaderProps()}
               {...(stickyColumnCount
