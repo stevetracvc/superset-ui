@@ -37,15 +37,29 @@ export type ColumnConfigPopoverProps = {
   column: ColumnConfigInfo;
   configFormLayout: ColumnConfigFormLayout;
   onChange: (value: ColumnConfig) => void;
+  columnGroups: string[];
+  setColumnGroups: (value: string[]) => void;
 };
 
 export default function ColumnConfigPopover({
   column,
   configFormLayout,
   onChange,
+  columnGroups,
+  setColumnGroups,
 }: ColumnConfigPopoverProps) {
+  const onlyUnique = (value: string, index: number, self: string[]) =>
+    self.indexOf(value) === index;
+  const newOnChange = (value: ColumnConfig) => {
+    const newColumnGroups = columnGroups
+      .concat([value.columnGroup || ''])
+      .filter(onlyUnique)
+      .filter(x => x != '');
+    setColumnGroups(newColumnGroups);
+    onChange(value);
+  };
   return (
-    <ControlForm onChange={onChange} value={column.config}>
+    <ControlForm onChange={newOnChange} value={column.config}>
       {configFormLayout[
         column.type === undefined ? GenericDataType.STRING : column.type
       ].map((row, i) => (
@@ -54,7 +68,9 @@ export default function ColumnConfigPopover({
             const key = typeof meta === 'string' ? meta : meta.name;
             const override =
               typeof meta === 'string'
-                ? {}
+                ? key == 'columnGroup'
+                  ? { options: columnGroups.map(x => [x, x]), setColumnGroups }
+                  : {}
                 : 'override' in meta
                 ? meta.override
                 : meta.config;

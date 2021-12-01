@@ -30,6 +30,8 @@ export default React.memo(function ColumnConfigItem({
   column,
   onChange,
   configFormLayout,
+  columnGroups,
+  setColumnGroups,
 }: ColumnConfigItemProps) {
   const { colors, gridUnit } = useTheme();
   const caretWidth = gridUnit * 6;
@@ -41,6 +43,8 @@ export default React.memo(function ColumnConfigItem({
           column={column}
           onChange={onChange}
           configFormLayout={configFormLayout}
+          columnGroups={columnGroups}
+          setColumnGroups={setColumnGroups}
         />
       )}
       trigger="click"

@@ -143,11 +143,14 @@ const colorPositiveNegative: ControlFormItemSpec<'Checkbox'> = {
   debounceDelay: 200,
 };
 
-const columnGroup: ControlFormItemSpec<'Input'> = {
-  controlType: 'Input',
+const columnGroup: ControlFormItemSpec<'Select'> = {
+  controlType: 'Select',
   label: t('Column Group Name'),
   description: t('Create super headers for groups of columns'),
   width: 120,
+  options: [],
+  defaultValue: undefined,
+  creatable: true,
   placeholder: undefined,
   debounceDelay: 400,
 };

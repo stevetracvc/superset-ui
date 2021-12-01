@@ -103,6 +103,14 @@ export default function ColumnConfigControl<T extends ColumnConfig>({
     return configs;
   }, [value, colnames, coltypes]);
   const [showAllColumns, setShowAllColumns] = useState(false);
+  const onlyUnique = (value: string, index: number, self: string[]) =>
+    self.indexOf(value) === index;
+  const [columnGroups, setColumnGroups] = useState<string[]>(
+    Object.entries(columnConfigs)
+      .map(x => x[1].config.columnGroup)
+      .filter(onlyUnique)
+      .filter(x => x),
+  );
 
   const getColumnInfo = (col: string) => columnConfigs[col] || {};
   const setColumnConfig = (col: string, config: T) => {
@@ -144,6 +152,8 @@ export default function ColumnConfigControl<T extends ColumnConfig>({
             column={getColumnInfo(col)}
             onChange={config => setColumnConfig(col, config as T)}
             configFormLayout={configFormLayout}
+            columnGroups={columnGroups}
+            setColumnGroups={setColumnGroups}
           />
         ))}
         {needShowMoreButton && (
