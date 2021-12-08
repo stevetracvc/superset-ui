@@ -153,6 +153,8 @@ const columnGroup: ControlFormItemSpec<'Select'> = {
   creatable: true,
   placeholder: undefined,
   debounceDelay: 400,
+  minWidth: '14em',
+  allowClear: true,
 };
 /**
  * All configurable column formatting properties.

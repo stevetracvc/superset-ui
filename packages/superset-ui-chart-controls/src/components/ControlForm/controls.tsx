@@ -49,6 +49,7 @@ export type ControlFormItemSpec<T extends ControlType = ControlType> = {
   required?: boolean;
   validators?: ControlFormValueValidator<any>[];
   width?: number | string;
+  allowClear?: boolean;
   /**
    * Time to delay change propagation.
    */
