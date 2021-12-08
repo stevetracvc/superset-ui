@@ -196,6 +196,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     sticky = true, // whether to use sticky header
     columnColorFormatters,
     rearrangeColumns = true,
+    truncateCell,
     numberRows = false,
   } = props;
   const timestampFormatter = useCallback(
@@ -463,7 +464,21 @@ export default function TableChart<D extends DataRecord = DataRecord>(
           }
           // If cellProps renderes textContent already, then we don't have to
           // render `Cell`. This saves some time for large tables.
-          return <td {...cellProps}>{text}</td>;
+          // return <td {...cellProps}>{text}</td>;
+          return (
+            <td {...cellProps}>
+              {truncateCell ? (
+                <div
+                  className="dt-truncate-cell"
+                  style={columnWidth ? { width: columnWidth } : undefined}
+                >
+                  {text}
+                </div>
+              ) : (
+                text
+              )}
+            </td>
+          );
         },
         Header: ({ column: col, onClick, style, onDragStart, onDrop }) => (
           <th

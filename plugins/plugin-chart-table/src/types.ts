@@ -73,6 +73,7 @@ export type TableChartFormData = QueryFormData & {
   column_config?: Record<string, ColumnConfig>;
   rearrange_columns?: boolean;
   sticky_column_count?: number;
+  truncate_cell?: boolean;
 };
 
 export interface TableChartProps extends ChartProps {
@@ -113,6 +114,7 @@ export interface TableChartTransformedProps<D extends DataRecord = DataRecord> {
   columnColorFormatters?: ColorFormatters;
   rearrangeColumns?: boolean;
   stickyColumnCount?: number;
+  truncateCell?: boolean;
   numberRows?: boolean;
 }
 

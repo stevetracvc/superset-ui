@@ -217,6 +217,7 @@ const transformProps = (
     conditional_formatting: conditionalFormatting,
     rearrange_columns: rearrangeColumns,
     sticky_column_count: stickyColumnCount,
+    truncate_cell: truncateCell,
     number_rows: numberRows,
   } = formData;
   const timeGrain = extractTimegrain(formData);
@@ -270,6 +271,7 @@ const transformProps = (
     timeGrain,
     rearrangeColumns,
     stickyColumnCount,
+    truncateCell,
     numberRows,
   };
 };

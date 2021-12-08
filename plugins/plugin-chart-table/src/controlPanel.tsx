@@ -473,6 +473,20 @@ const config: ControlPanelConfig = {
         ],
         [
           {
+            name: 'truncate_cell',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Truncate long cells'),
+              renderTrigger: true,
+              default: false,
+              description: t(
+                'Truncate long cells and show ellipsis instead. Hovering will display full text.',
+              ),
+            },
+          },
+        ],
+        [
+          {
             name: 'sticky_column_count',
             config: {
               type: 'TextControl',

@@ -90,6 +90,18 @@ export default styled.div`
     box-shadow: inset -2px 0 0 0 #000000;
   }
 
+  .dt-truncate-cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dt-truncate-cell:hover {
+    overflow: visible;
+    white-space: normal;
+    height: auto;
+  }
+
   .dt-pagination {
     text-align: right;
     /* use padding instead of margin so clientHeight can capture it */
